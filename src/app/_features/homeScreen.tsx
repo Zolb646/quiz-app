@@ -1,42 +1,23 @@
+"use client";
 import { Header } from "../_components/header";
 import { SideBar } from "../_components/sideBar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { BsStars } from "react-icons/bs";
-import { FiFileText } from "react-icons/fi";
-
+import React from "react";
+import { HomeSection } from "../_components/homeSection";
+import { SummarySection } from "../_components/summarySection";
+import { QuizSection } from "../_components/quizSection";
+import { QuizResultSection } from "../_components/quizResultSection";
 export const HomeScreen = () => {
+  const [step, setStep] = React.useState(2);
   return (
     <div className="h-screen w-full flex flex-col bg-[#f0f2f5]">
       <Header />
       <div className="flex h-full">
         <SideBar />
-        <div className="w-full h-screen px-64">
-          <Card className="mt-20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BsStars className="size-6" />
-                <h1 className="text-2xl font-bold">Article Quiz Generator</h1>
-              </CardTitle>
-              <CardDescription className="text-base">
-                Paste your article below to generate a summarize and quiz
-                question. Your articles will saved in the sidebar for future
-                reference.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Label htmlFor="article" className="text-lg font-medium">
-                <FiFileText />
-                <span className="ml-2">Article Title</span>
-              </Label>
-            </CardContent>
-          </Card>
+        <div className="w-full h-full flex flex-col items-center pt-20">
+          {step === 1 && <HomeSection setStep={setStep} />}
+          {step === 2 && <SummarySection setStep={setStep} />}
+          {step === 3 && <QuizSection setStep={setStep} />}
+          {step === 4 && <QuizResultSection setStep={setStep} />}
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ export const SideBar = () => {
   const [open, setOpen] = React.useState(false);
   return (
     <div
-      className={`h-full bg-white py-5 flex flex-col space-y-4 transition-all duration-300 ${
+      className={`h-full bg-white py-5 flex flex-col space-y-4 transition-all duration-100 ${
         open ? "w-80 px-4" : "w-16 items-center"
       }`}
     >
