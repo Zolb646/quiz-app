@@ -27,7 +27,7 @@ model Article {
   id        String      @id @unique @default(cuid())
   title     String
   content   String
-  summary   String
+  summary   String?
   userId    String
   user     User        @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())

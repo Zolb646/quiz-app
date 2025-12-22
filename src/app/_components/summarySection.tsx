@@ -17,11 +17,13 @@ import {
 } from "@/components/ui/dialog";
 import { SummaryDialogContent } from "./summaryDialogContent";
 import { FaAngleLeft } from "react-icons/fa";
+import { useArticle } from "../_context/articleContext";
 
 type HomeSectionProps = {
   setStep: React.Dispatch<React.SetStateAction<number>>;
 };
 export const SummarySection = ({ setStep }: HomeSectionProps) => {
+  const { article } = useArticle();
   return (
     <div>
       <Button
@@ -44,33 +46,11 @@ export const SummarySection = ({ setStep }: HomeSectionProps) => {
             <span className="text-zinc-500">Summary Content</span>
           </Label>
 
-          <h1 className="mt-2 font-bold text-2xl">Summary of the Quiz</h1>
+          <h1 className="mt-2 font-bold text-2xl">{article?.title}</h1>
 
           {/* MULTI-LINE CLAMP */}
           <p className="mt-2 text-sm text-zinc-600 line-clamp-10">
-            Genghis Khan, born Temüjin around 1162, was the founder of the
-            Mongol Empire. After his father's death, Temüjin's family was left
-            in poverty, and he later killed his half-brother to secure his
-            position. He built alliances with leaders like Jamukha and Toghrul,
-            and despite being defeated in battle and briefly under the Jin
-            dynasty, he rose to power by defeating rivals... Genghis Khan, born
-            Temüjin around 1162, was the founder of the Mongol Empire. After his
-            father's death, Temüjin's family was left in poverty, and he later
-            killed his half-brother to secure his position. He built alliances
-            with leaders like Jamukha and Toghrul, and despite being defeated in
-            battle and briefly under the Jin dynasty, he rose to power by
-            defeating rivals... Genghis Khan, born Temüjin around 1162, was the
-            founder of the Mongol Empire. After his father's death, Temüjin's
-            family was left in poverty, and he later killed his half-brother to
-            secure his position. He built alliances with leaders like Jamukha
-            and Toghrul, and despite being defeated in battle and briefly under
-            the Jin dynasty, he rose to power by defeating rivals... Genghis
-            Khan, born Temüjin around 1162, was the founder of the Mongol
-            Empire. After his father's death, Temüjin's family was left in
-            poverty, and he later killed his half-brother to secure his
-            position. He built alliances with leaders like Jamukha and Toghrul,
-            and despite being defeated in battle and briefly under the Jin
-            dynasty, he rose to power by defeating rivals
+            {article?.summary}
           </p>
         </CardContent>
         <CardFooter className="justify-between">

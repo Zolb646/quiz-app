@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { FiFileText } from "react-icons/fi";
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/nextjs";
+import { useArticle } from "../_context/articleContext";
 
 type HomeSectionProps = {
   setStep: React.Dispatch<React.SetStateAction<number>>;
@@ -20,6 +22,40 @@ type HomeSectionProps = {
 export const HomeSection = ({ setStep }: HomeSectionProps) => {
   const [articleTitle, setArticleTitle] = React.useState("");
   const [articleContent, setArticleContent] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const { setArticle } = useArticle();
+  const userId = useUser();
+  const handleGenerateSummary = async () => {
+    if (!articleTitle || !articleContent) return;
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/articles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: articleTitle,
+          content: articleContent,
+          userId: userId.user?.id,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to generate summary");
+
+      const data = await response.json();
+      console.log("Generated Article:", data);
+      setArticle(data.article);
+
+      // Move to next step after successful summary
+      setStep((prev) => prev + 1);
+    } catch (error) {
+      console.error(error);
+      alert("There was an error generating the summary.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Card className="w-3xl">
       <CardHeader>
@@ -59,19 +95,26 @@ export const HomeSection = ({ setStep }: HomeSectionProps) => {
           <Textarea
             id="article-content"
             placeholder="Paste your article content here..."
-            className="resize-none shadow-none min-h-30 mt-2"
+            className="resize-none shadow-none min-h-30 mt-2  scrollbar-hide"
             onChange={(e) => setArticleContent(e.target.value)}
           />
         </div>
       </CardContent>
       <CardFooter className="justify-end">
         <Button
-          disabled={!articleContent || !articleTitle}
+          disabled={!articleContent.trim() || !articleTitle.trim() || loading}
           onClick={() => {
-            setStep((prev) => prev + 1);
+            console.log("error");
+
+            handleGenerateSummary();
           }}
+          className={
+            !articleContent.trim() || !articleTitle.trim() || loading
+              ? "bg-[#71717A]"
+              : ""
+          }
         >
-          Generate summary
+          {loading ? "Generating..." : "Generate summary"}
         </Button>
       </CardFooter>
     </Card>
