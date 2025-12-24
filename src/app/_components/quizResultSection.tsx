@@ -36,25 +36,29 @@ export const QuizResultSection = ({
           </CardTitle>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="space-y-5">
           {results.map((res, idx) => {
             const isCorrect = res.userAnswer === res.correctAnswer;
+
             return (
-              <div className="flex gap-3 mt-5" key={idx}>
+              <div key={idx} className="flex items-start gap-3">
                 {isCorrect ? (
-                  <HiOutlineCheckCircle className="text-green-500 size-7" />
+                  <HiOutlineCheckCircle className="text-green-500 size-7 shrink-0" />
                 ) : (
-                  <FiXCircle className="text-red-500 size-7" />
+                  <FiXCircle className="text-red-500 size-7 shrink-0" />
                 )}
-                <div className="flex flex-col gap-1">
-                  <p className="text-[#737373] text-sm wrap-break-words">
+
+                <div className="flex flex-col gap-1 min-w-0">
+                  <p className="text-zinc-500 text-sm wrap-break-words">
                     {idx + 1}. {res.question}
                   </p>
-                  <p className="font-medium">
+
+                  <p className="font-medium wrap-break-words">
                     Your answer: {res.userAnswer || "No answer"}
                   </p>
+
                   {!isCorrect && (
-                    <p className="text-sm text-green-500">
+                    <p className="text-sm text-green-500 wrap-break-words">
                       Correct answer: {res.correctAnswer}
                     </p>
                   )}

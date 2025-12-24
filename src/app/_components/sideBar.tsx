@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LuPanelLeftOpen, LuPanelLeftClose } from "react-icons/lu";
 import { useArticle } from "../_context/articleContext";
+import { useRouter } from "next/navigation";
 
 type Article = {
   id?: string;
@@ -30,6 +31,7 @@ export const SideBar = ({ setStep }: SideBarProps) => {
     last30Days: [],
   });
   const { setArticle } = useArticle();
+  const router = useRouter();
 
   useEffect(() => {
     fetch("/api/articles")
@@ -40,7 +42,7 @@ export const SideBar = ({ setStep }: SideBarProps) => {
 
   const handleSelectArticle = (article: Article) => {
     setArticle(article);
-    setStep(2); // 👈 SummarySection
+    router.push(`/article/${article.id}`);
     setOpen(false);
   };
 

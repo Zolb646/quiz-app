@@ -13,6 +13,17 @@ import { FiX } from "react-icons/fi";
 import { useArticle } from "../_context/articleContext";
 import { useEffect, useState } from "react";
 import { useQuiz } from "../_context/quizContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type HomeSectionProps = {
   setStep: React.Dispatch<React.SetStateAction<number>>;
@@ -33,34 +44,37 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
   } = useQuiz();
   const [loading, setLoading] = useState(true);
   const [loadedQuizzes, setLoadedQuizzes] = useState(false);
+  // useEffect(() => {
+  //   if (!article?.id) return;
+
+  const generateQuizzes = async () => {
+    if (loadedQuizzes) return;
+    try {
+      setLoading(true);
+      setCurrentIndex(0);
+      setSelectedOption(null);
+      setScore(0);
+
+      const res = await fetch(`/api/article/${article?.id}/quizzes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numQuestions: 5 }),
+      });
+
+      const data = await res.json();
+      setQuizzes(data.quizzes ?? []);
+      setLoadedQuizzes(true);
+      console.log(data, "data");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //   generateQuizzes();
+  // }, []);
   useEffect(() => {
-    if (!article?.id) return;
-
-    const generateQuizzes = async () => {
-      if (loadedQuizzes) return;
-      try {
-        setLoading(true);
-        setCurrentIndex(0);
-        setSelectedOption(null);
-        setScore(0);
-
-        const res = await fetch(`/api/article/${article.id}/quizzes`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ numQuestions: 5 }),
-        });
-
-        const data = await res.json();
-        setQuizzes(data.quizzes ?? []);
-        setLoadedQuizzes(true);
-        console.log(data, "data");
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     generateQuizzes();
   }, []);
 
@@ -70,21 +84,19 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
     const updatedQuizzes = [...quizzes];
     updatedQuizzes[currentIndex] = {
       ...updatedQuizzes[currentIndex],
-      selectedOption, // save user answer here
+      selectedOption,
     };
     setQuizzes(updatedQuizzes);
 
-    // check correctness
     if (selectedOption === updatedQuizzes[currentIndex].answer) {
       setScore((prev) => prev + 1);
     }
 
-    // move to next
     if (currentIndex + 1 < updatedQuizzes.length) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
     } else {
-      setStep(4); // finish
+      setStep(4);
     }
   };
 
@@ -105,14 +117,33 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
           </CardDescription>
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-6 right-6 border bg-white"
-          onClick={() => setStep(1)}
-        >
-          <FiX />
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-6 right-6 border bg-white"
+              // onClick={() => setStep(1)}
+            >
+              <FiX />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                If you press 'Cancel', this quiz will restart from the
+                beginning.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Go back</AlertDialogCancel>
+              <AlertDialogAction onClick={() => setStep(1)}>
+                Cancel Quiz
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardHeader>
 
       <CardContent className="bg-white border rounded-lg p-7 shadow-lg mx-6">
@@ -132,8 +163,9 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
               key={option}
               onClick={() => setSelectedOption(option)}
               variant={selectedOption === option ? "default" : "outline"}
+              className="h-fit"
             >
-              {option}
+              <p className="w-fit wrap-break-word">{option}</p>
             </Button>
           ))}
         </div>

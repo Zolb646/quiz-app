@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 const ArticleSchema = z.object({
   title: z.string().min(3),
   content: z.string().min(20),
-  userId: z.string(), // ✅ actual userId
+  userId: z.string(),
 });
 
 const genAI = new GoogleGenAI({

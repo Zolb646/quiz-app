@@ -11,6 +11,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ArticleProvider } from "./_context/articleContext";
 import { QuizProvider } from "./_context/quizContext";
+import InitUser from "./_components/initUser";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
             <body
               className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
             >
+              <InitUser />
               {children}
             </body>
           </html>

@@ -1,33 +1,28 @@
 import prisma from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-export const POST = async (
-  req: Request,
+export async function GET(
+  _req: Request,
   { params }: { params: { articleId: string } }
-) => {
+) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-
-    const body = await req.json();
-
-    const article = await prisma.article.updateMany({
-      where: {
-        id: params.articleId,
-        userId,
-      },
-      data: body,
+    const article = await prisma.article.findUnique({
+      where: { id: params.articleId },
+      include: { quizzes: true },
     });
 
-    if (!article.count) {
-      return new Response("Article not found", { status: 404 });
+    if (!article) {
+      return NextResponse.json(
+        { message: "Article not found" },
+        { status: 404 }
+      );
     }
 
-    return Response.json({ success: true });
+    return NextResponse.json(article);
   } catch (error) {
-    console.error(error);
-    return new Response("Internal Server Error", { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to fetch article" },
+      { status: 500 }
+    );
   }
-};
+}
