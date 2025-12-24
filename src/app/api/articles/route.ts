@@ -2,11 +2,11 @@ import prisma from "../../../lib/prisma";
 import { z } from "zod";
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
 const ArticleSchema = z.object({
   title: z.string().min(3),
   content: z.string().min(20),
-  userId: z.string(),
 });
 
 const genAI = new GoogleGenAI({
@@ -17,6 +17,11 @@ export const POST = async (req: Request) => {
   try {
     const body = await req.json();
     const data = ArticleSchema.parse(body);
+    const session = await auth();
+
+    const user = await prisma.user.findUnique({
+      where: { clerkId: session.userId! },
+    });
 
     const res = await genAI.models.generateContent({
       model: "gemini-2.5-flash",
@@ -27,8 +32,8 @@ export const POST = async (req: Request) => {
       data: {
         title: data.title,
         content: data.content,
-        userId: data.userId,
         summary: res.text ?? "",
+        userId: user?.id!,
       },
     });
 

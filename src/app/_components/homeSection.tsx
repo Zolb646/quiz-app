@@ -13,7 +13,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { FiFileText } from "react-icons/fi";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
 import { useArticle } from "../_context/articleContext";
 
 type HomeSectionProps = {
@@ -24,7 +23,6 @@ export const HomeSection = ({ setStep }: HomeSectionProps) => {
   const [articleContent, setArticleContent] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const { setArticle } = useArticle();
-  const userId = useUser();
   const handleGenerateSummary = async () => {
     if (!articleTitle || !articleContent) return;
 
@@ -37,7 +35,6 @@ export const HomeSection = ({ setStep }: HomeSectionProps) => {
         body: JSON.stringify({
           title: articleTitle,
           content: articleContent,
-          userId: userId.user?.id,
         }),
       });
 

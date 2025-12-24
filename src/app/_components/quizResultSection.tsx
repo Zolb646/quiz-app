@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -18,17 +20,54 @@ export const QuizResultSection = ({
 }: {
   setStep: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-  const { quizzes, score } = useQuiz();
+  const {
+    quizzes,
+    score,
+    setCurrentIndex,
+    setSelectedOption,
+    setScore,
+    setQuizzes,
+  } = useQuiz();
 
   const results = quizzes.map((q) => ({
     question: q.question,
     userAnswer: q.selectedOption ?? "",
     correctAnswer: q.answer,
   }));
+
+  // 🔁 Retake without regenerating
+  const handleRetake = () => {
+    const resetQuizzes = quizzes.map((q) => ({
+      ...q,
+      selectedOption: "",
+    }));
+
+    setQuizzes(resetQuizzes);
+    setCurrentIndex(0);
+    setSelectedOption("");
+    setScore(0);
+
+    setStep(3); // QuizSection
+  };
+
+  // 📌 Leave quiz safely
+  const handleSaveAndLeave = () => {
+    setCurrentIndex(0);
+    setSelectedOption("");
+    setScore(0);
+
+    // OPTIONAL:
+    // If you want to completely clear quiz state, uncomment:
+    // setQuizzes([]);
+
+    setStep(1); // Back to article / summary
+  };
+
   return (
     <div className="min-w-md max-w-lg flex flex-col">
       <HeaderTitle title="Quiz Completed" />
       <p className="text-gray-600 mt-2 font-medium">Let’s see what you did</p>
+
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-baseline gap-2.5">
           <CardTitle className="text-2xl">
@@ -53,7 +92,7 @@ export const QuizResultSection = ({
                     {idx + 1}. {res.question}
                   </p>
 
-                  <p className="font-medium wrap-break-words">
+                  <p className="font-medium wrap-reak-words">
                     Your answer: {res.userAnswer || "No answer"}
                   </p>
 
@@ -69,16 +108,13 @@ export const QuizResultSection = ({
         </CardContent>
 
         <CardFooter className="gap-5 flex flex-col sm:flex-row">
-          <Button
-            className="w-full"
-            variant="outline"
-            onClick={() => setStep(3)}
-          >
-            <RxReload className="size-4 mr-0.5" />
+          <Button className="w-full" variant="outline" onClick={handleRetake}>
+            <RxReload className="size-4 mr-1" />
             Retake Quiz
           </Button>
-          <Button className="w-full" onClick={() => setStep(1)}>
-            <FaRegBookmark className="size-4 mr-0.5" />
+
+          <Button className="w-full" onClick={handleSaveAndLeave}>
+            <FaRegBookmark className="size-4 mr-1" />
             Save and Leave
           </Button>
         </CardFooter>

@@ -10,8 +10,6 @@ import {
 import { HeaderTitle } from "./headerTitle";
 import { Button } from "@/components/ui/button";
 import { FiX } from "react-icons/fi";
-import { useArticle } from "../_context/articleContext";
-import { useEffect, useState } from "react";
 import { useQuiz } from "../_context/quizContext";
 import {
   AlertDialog,
@@ -30,8 +28,6 @@ type HomeSectionProps = {
 };
 
 export const QuizSection = ({ setStep }: HomeSectionProps) => {
-  const { article } = useArticle();
-
   const {
     quizzes,
     setQuizzes,
@@ -40,43 +36,13 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
     setScore,
     selectedOption,
     currentIndex,
-    score,
   } = useQuiz();
-  const [loading, setLoading] = useState(true);
-  const [loadedQuizzes, setLoadedQuizzes] = useState(false);
-  // useEffect(() => {
-  //   if (!article?.id) return;
 
-  const generateQuizzes = async () => {
-    if (loadedQuizzes) return;
-    try {
-      setLoading(true);
-      setCurrentIndex(0);
-      setSelectedOption(null);
-      setScore(0);
+  if (!quizzes.length) {
+    return <p className="text-center">No quizzes available</p>;
+  }
 
-      const res = await fetch(`/api/article/${article?.id}/quizzes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ numQuestions: 5 }),
-      });
-
-      const data = await res.json();
-      setQuizzes(data.quizzes ?? []);
-      setLoadedQuizzes(true);
-      console.log(data, "data");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  //   generateQuizzes();
-  // }, []);
-  useEffect(() => {
-    generateQuizzes();
-  }, []);
+  const currentQuiz = quizzes[currentIndex];
 
   const handleSubmit = () => {
     if (selectedOption === null) return;
@@ -86,9 +52,10 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
       ...updatedQuizzes[currentIndex],
       selectedOption,
     };
+
     setQuizzes(updatedQuizzes);
 
-    if (selectedOption === updatedQuizzes[currentIndex].answer) {
+    if (selectedOption === currentQuiz.answer) {
       setScore((prev) => prev + 1);
     }
 
@@ -96,14 +63,9 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
     } else {
-      setStep(4);
+      setStep(4); // results step
     }
   };
-
-  if (loading) return <p>Loading quizzes...</p>;
-  if (!quizzes.length) return <p>No quizzes</p>;
-
-  const currentQuiz = quizzes[currentIndex];
 
   return (
     <Card className="bg-[#f0f2f5] shadow-none border-none relative w-full max-w-3xl mx-auto">
@@ -123,22 +85,29 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
               variant="ghost"
               size="icon"
               className="absolute top-6 right-6 border bg-white"
-              // onClick={() => setStep(1)}
             >
               <FiX />
             </Button>
           </AlertDialogTrigger>
+
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                If you press 'Cancel', this quiz will restart from the
-                beginning.
+                If you cancel, this quiz will restart from the beginning.
               </AlertDialogDescription>
             </AlertDialogHeader>
+
             <AlertDialogFooter>
               <AlertDialogCancel>Go back</AlertDialogCancel>
-              <AlertDialogAction onClick={() => setStep(1)}>
+              <AlertDialogAction
+                onClick={() => {
+                  setCurrentIndex(0);
+                  setSelectedOption(null);
+                  setScore(0);
+                  setStep(1);
+                }}
+              >
                 Cancel Quiz
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -165,7 +134,7 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
               variant={selectedOption === option ? "default" : "outline"}
               className="h-fit"
             >
-              <p className="w-fit wrap-break-word">{option}</p>
+              {option}
             </Button>
           ))}
         </div>
