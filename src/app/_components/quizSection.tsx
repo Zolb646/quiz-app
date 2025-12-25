@@ -43,18 +43,17 @@ export const QuizSection = () => {
 
   const currentQuiz = quizzes[currentIndex];
 
-  const handleSubmit = () => {
-    if (selectedOption === null) return;
-
+  const handleAnswerSelect = (option: string) => {
     const updatedQuizzes = [...quizzes];
+
     updatedQuizzes[currentIndex] = {
       ...updatedQuizzes[currentIndex],
-      selectedOption,
+      selectedOption: option,
     };
 
     setQuizzes(updatedQuizzes);
 
-    if (selectedOption === currentQuiz.answer) {
+    if (option === currentQuiz.answer) {
       setScore((prev) => prev + 1);
     }
 
@@ -129,23 +128,13 @@ export const QuizSection = () => {
           {currentQuiz.options.map((option) => (
             <Button
               key={option}
-              onClick={() => setSelectedOption(option)}
-              variant={selectedOption === option ? "default" : "outline"}
-              className="h-fit"
+              onClick={() => handleAnswerSelect(option)}
+              variant="outline"
+              className="h-full w-full transition-transform duration-200 hover:scale-105 hover:bg-black hover:text-white hover:shadow-lg active:translate-y-0 active:shadow-md"
             >
-              {option}
+              <p className="wrap-break-words whitespace-normal">{option}</p>
             </Button>
           ))}
-        </div>
-
-        <div className="pt-5">
-          <Button
-            onClick={handleSubmit}
-            variant="outline"
-            disabled={!selectedOption}
-          >
-            {currentIndex + 1 < quizzes.length ? "Next" : "Finish"}
-          </Button>
         </div>
       </CardContent>
     </Card>
