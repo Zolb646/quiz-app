@@ -12,7 +12,10 @@ const quizSchema = z.array(
   z.object({
     question: z.string(),
     options: z.array(z.string()).length(4),
-    answer: z.string().regex(/^[0-3]$/),
+    answer: z.union([
+      z.number().int().min(0).max(3),
+      z.string().regex(/^[0-3]$/),
+    ]),
   })
 );
 
@@ -66,13 +69,14 @@ Make sure the response is valid JSON and the answer is the index (0-3) of the co
 
     const savedQuizzes = await prisma.$transaction(
       quizzes.map((q) => {
-        const answerIndex = Number(q.answer);
+        const answerIndex =
+          typeof q.answer === "string" ? Number(q.answer) : q.answer;
 
         return prisma.quiz.create({
           data: {
             question: q.question,
             options: q.options,
-            answer: q.options[answerIndex], // ✅ store real answer
+            answer: q.options[answerIndex],
             articleId,
           },
         });

@@ -19,11 +19,7 @@ type HistoryResponse = {
   last30Days: Article[];
 };
 
-type SideBarProps = {
-  setStep: React.Dispatch<React.SetStateAction<number>>;
-};
-
-export const SideBar = ({ setStep }: SideBarProps) => {
+export const SideBar = () => {
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<HistoryResponse>({
     yesterday: [],

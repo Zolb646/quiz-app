@@ -14,12 +14,9 @@ import { Button } from "@/components/ui/button";
 import { RxReload } from "react-icons/rx";
 import { FaRegBookmark } from "react-icons/fa6";
 import { useQuiz } from "../_context/quizContext";
+import { useStep } from "../_context/stepContext";
 
-export const QuizResultSection = ({
-  setStep,
-}: {
-  setStep: React.Dispatch<React.SetStateAction<number>>;
-}) => {
+export const QuizResultSection = () => {
   const {
     quizzes,
     score,
@@ -28,6 +25,7 @@ export const QuizResultSection = ({
     setScore,
     setQuizzes,
   } = useQuiz();
+  const { setStep, prevStep } = useStep();
 
   const results = quizzes.map((q) => ({
     question: q.question,
@@ -47,7 +45,7 @@ export const QuizResultSection = ({
     setSelectedOption("");
     setScore(0);
 
-    setStep(3); // QuizSection
+    prevStep();
   };
 
   // 📌 Leave quiz safely
@@ -60,7 +58,7 @@ export const QuizResultSection = ({
     // If you want to completely clear quiz state, uncomment:
     // setQuizzes([]);
 
-    setStep(1); // Back to article / summary
+    setStep(0); // Back to article / summary
   };
 
   return (

@@ -1,12 +1,13 @@
+import ArticleClient from "@/app/_features/articleClient";
+
 type PageProps = {
-  params: {
+  params: Promise<{
     articleId: string;
-  };
+  }>;
 };
 
 export default async function ArticlePage({ params }: PageProps) {
-  const articleId = params.articleId;
+  const { articleId } = await params;
 
-  return;
-  //   <ArticleClient article={article} />;
+  return <ArticleClient articleId={`${articleId}`} />;
 }

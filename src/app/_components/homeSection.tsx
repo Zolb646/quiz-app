@@ -14,15 +14,14 @@ import { FiFileText } from "react-icons/fi";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useArticle } from "../_context/articleContext";
+import { useStep } from "../_context/stepContext";
 
-type HomeSectionProps = {
-  setStep: React.Dispatch<React.SetStateAction<number>>;
-};
-export const HomeSection = ({ setStep }: HomeSectionProps) => {
+export const HomeSection = () => {
   const [articleTitle, setArticleTitle] = React.useState("");
   const [articleContent, setArticleContent] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const { setArticle } = useArticle();
+  const { nextStep } = useStep();
   const handleGenerateSummary = async () => {
     if (!articleTitle || !articleContent) return;
 
@@ -44,8 +43,7 @@ export const HomeSection = ({ setStep }: HomeSectionProps) => {
       console.log("Generated Article:", data);
       setArticle(data.article);
 
-      // Move to next step after successful summary
-      setStep((prev) => prev + 1);
+      nextStep();
     } catch (error) {
       console.error(error);
       alert("There was an error generating the summary.");

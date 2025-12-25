@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useArticle } from "../_context/articleContext";
+import { SummarySection } from "../_components/summarySection";
+import { Header } from "../_components/header";
+import { SideBar } from "../_components/sideBar";
+import { useStep } from "../_context/stepContext";
+import { AppShell } from "../_components/appShell";
+import { QuizSection } from "../_components/quizSection";
+import { QuizResultSection } from "../_components/quizResultSection";
 
 type ArticleClientProps = {
   articleId: string;
@@ -10,12 +17,16 @@ type ArticleClientProps = {
 export default function ArticleClient({ articleId }: ArticleClientProps) {
   const { setArticle } = useArticle();
   const [articleLoaded, setArticleLoaded] = useState(false);
-  const [step, setStep] = useState(1);
+  const { step, setStep } = useStep();
+
+  useEffect(() => {
+    setStep(0);
+  }, [setStep]);
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const res = await fetch(`/api/articles/${articleId}`);
+        const res = await fetch(`/api/article/${articleId}`);
         if (!res.ok) throw new Error("Failed to fetch article");
 
         const data = await res.json();
@@ -29,13 +40,13 @@ export default function ArticleClient({ articleId }: ArticleClientProps) {
     fetchArticle();
   }, [articleId, setArticle]);
 
-  if (!articleLoaded) return <div>Loading...</div>;
+  if (!articleLoaded) return <AppShell>Loading...</AppShell>;
 
-  // Step 1 = summary, Step 2 = quizzes
-  return;
-  //   step === 1 ? (
-  //     <SummarySection setStep={setStep} />
-  //   ) : (
-  //     <QuizSection setStep={setStep} />
-  //   );
+  return (
+    <AppShell>
+      {step === 0 && <SummarySection />}
+      {step === 1 && <QuizSection />}
+      {step === 2 && <QuizResultSection />}
+    </AppShell>
+  );
 }

@@ -22,12 +22,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useStep } from "../_context/stepContext";
 
-type HomeSectionProps = {
-  setStep: React.Dispatch<React.SetStateAction<number>>;
-};
-
-export const QuizSection = ({ setStep }: HomeSectionProps) => {
+export const QuizSection = () => {
   const {
     quizzes,
     setQuizzes,
@@ -37,6 +34,8 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
     selectedOption,
     currentIndex,
   } = useQuiz();
+
+  const { nextStep, setStep } = useStep();
 
   if (!quizzes.length) {
     return <p className="text-center">No quizzes available</p>;
@@ -63,7 +62,7 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
     } else {
-      setStep(4); // results step
+      nextStep();
     }
   };
 
@@ -105,7 +104,7 @@ export const QuizSection = ({ setStep }: HomeSectionProps) => {
                   setCurrentIndex(0);
                   setSelectedOption(null);
                   setScore(0);
-                  setStep(1);
+                  setStep(0);
                 }}
               >
                 Cancel Quiz

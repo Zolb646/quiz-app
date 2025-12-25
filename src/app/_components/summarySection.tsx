@@ -17,17 +17,20 @@ import { FaAngleLeft } from "react-icons/fa";
 import { useArticle } from "../_context/articleContext";
 import { useQuiz } from "../_context/quizContext";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useStep } from "../_context/stepContext";
+import { usePathname } from "next/navigation";
+import { FiFileText } from "react-icons/fi";
 
-type HomeSectionProps = {
-  setStep: React.Dispatch<React.SetStateAction<number>>;
-};
-
-export const SummarySection = ({ setStep }: HomeSectionProps) => {
+export const SummarySection = () => {
   const { article } = useArticle();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const { setQuizzes, setCurrentIndex, setSelectedOption, setScore } =
     useQuiz();
-
-  const [loading, setLoading] = useState(false);
+  const { nextStep } = useStep();
+  const pathname = usePathname();
+  const isArticlePage = pathname.startsWith("/article/");
 
   const handleTakeQuiz = async () => {
     if (!article?.id) return;
@@ -43,12 +46,12 @@ export const SummarySection = ({ setStep }: HomeSectionProps) => {
 
       const data = await res.json();
 
+      nextStep();
+
       setQuizzes(data.quizzes ?? []);
       setCurrentIndex(0);
       setSelectedOption(null);
       setScore(0);
-
-      setStep(3); // 👉 QuizSection step
     } catch (err) {
       console.error("Failed to load quizzes", err);
     } finally {
@@ -62,7 +65,7 @@ export const SummarySection = ({ setStep }: HomeSectionProps) => {
         variant="outline"
         size="icon"
         className="mb-6"
-        onClick={() => setStep(1)}
+        onClick={() => router.push(`/`)}
       >
         <FaAngleLeft className="size-5" />
       </Button>
@@ -74,7 +77,7 @@ export const SummarySection = ({ setStep }: HomeSectionProps) => {
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="flex-1 overflow-hidden">
+        <CardContent className="flex-1 overflow-hidden mt-3">
           <Label className="flex gap-2 items-center">
             <BsBook className="size-4" />
             <span className="text-zinc-500">Summary Content</span>
@@ -85,15 +88,49 @@ export const SummarySection = ({ setStep }: HomeSectionProps) => {
           <p className="mt-2 text-sm text-zinc-600 line-clamp-10">
             {article?.summary}
           </p>
+
+          {isArticlePage && (
+            <div className="pt-4">
+              <div className="flex items-center justify-between">
+                <Label
+                  htmlFor="article-title"
+                  className="font-medium flex items-center"
+                >
+                  <FiFileText />
+                  <span className="ml-1 text-[#71717a]">Article Title</span>
+                </Label>
+              </div>
+
+              <p className="mt-2 text-sm text-zinc-700 line-clamp-6 whitespace-pre-line">
+                {article?.content}
+              </p>
+              <div className="w-full flex justify-end">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="font-semibold text-sm"
+                    >
+                      See more
+                    </Button>
+                  </DialogTrigger>
+                  <SummaryDialogContent />
+                </Dialog>
+              </div>
+            </div>
+          )}
         </CardContent>
 
         <CardFooter className="justify-between">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">See Content</Button>
-            </DialogTrigger>
-            <SummaryDialogContent />
-          </Dialog>
+          {!isArticlePage && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">See Content</Button>
+              </DialogTrigger>
+              <SummaryDialogContent />
+            </Dialog>
+          )}
 
           <Button onClick={handleTakeQuiz} disabled={loading}>
             {loading ? "Preparing quiz..." : "Take a quiz"}
