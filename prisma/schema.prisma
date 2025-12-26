@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -24,57 +23,57 @@ datasource db {
 // }
 
 model Article {
-  id        String      @id @unique @default(cuid())
+  id        String   @id @unique @default(cuid())
   title     String
   content   String
   summary   String?
   userId    String
-  user     User        @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
   quizzes   Quiz[]
 }
 
 model User {
-  id    String     @id @unique @default(cuid())
-  clerkId String? @unique 
-  email String  @unique
-  name  String? 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
-  articles Article[]
+  id            String        @id @unique @default(cuid())
+  clerkId       String?       @unique
+  email         String        @unique
+  name          String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
+  articles      Article[]
   quizzAttempts QuizAttempt[]
-  userScores UserScores[]
+  userScores    UserScores[]
 }
 
 model Quiz {
-  id        String      @id @unique @default(cuid())
-  question     String
-  answer   String
-  options   String[]
-  articleId    String
-  article     Article        @relation(fields: [articleId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  id            String        @id @unique @default(cuid())
+  question      String
+  answer        String
+  options       String[]
+  articleId     String
+  article       Article       @relation(fields: [articleId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
   quizzAttempts QuizAttempt[]
-  userScores UserScores[]
+  userScores    UserScores[]
 }
 
 model QuizAttempt {
-  id        String      @id @unique @default(cuid())
+  id        String   @id @unique @default(cuid())
   userId    String
-  user     User        @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   quizId    String
-  quiz     Quiz        @relation(fields: [quizId], references: [id])
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
   createdAt DateTime @default(now())
 }
 
 model UserScores {
-  id        String      @id @unique @default(cuid())
-  userId    String
-  user     User        @relation(fields: [userId], references: [id])
-  totalScore     Int
-  quizId    String
-  quiz     Quiz        @relation(fields: [quizId], references: [id])
-  createdAt DateTime @default(now())
+  id         String   @id @unique @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  totalScore Int
+  quizId     String
+  quiz       Quiz     @relation(fields: [quizId], references: [id])
+  createdAt  DateTime @default(now())
 }
