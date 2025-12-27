@@ -23,16 +23,17 @@ const genAI = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
 });
 
+const MAX_QUIZZES = 5;
+
 export async function POST(
   req: NextRequest,
   context: { params: Promise<{ articleId: string }> }
 ) {
   try {
     const { articleId } = await context.params;
-    console.log("ARTICLE ID:", articleId);
 
     const body = bodySchema.parse(await req.json());
-    const numQuestions = body.numQuestions ?? 5;
+    const requested = body.numQuestions ?? MAX_QUIZZES;
 
     const article = await prisma.article.findUnique({
       where: { id: articleId },
@@ -42,7 +43,22 @@ export async function POST(
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
 
-    const prompt = `Generate ${numQuestions} multiple choice questions based on this article:
+    const existingQuizzes = await prisma.quiz.findMany({
+      where: { articleId },
+    });
+
+    if (existingQuizzes.length >= MAX_QUIZZES) {
+      return NextResponse.json({ quizzes: existingQuizzes });
+    }
+
+    const remaining = Math.min(MAX_QUIZZES - existingQuizzes.length, requested);
+
+    if (remaining <= 0) {
+      return NextResponse.json({ quizzes: existingQuizzes });
+    }
+
+    const prompt = `Generate ${remaining} multiple choice questions based on this article:
+
 ${article.content}
 
 Return the response in this exact JSON format:
@@ -53,7 +69,12 @@ Return the response in this exact JSON format:
     "answer": "0"
   }
 ]
-Make sure the response is valid JSON and the answer is the index (0-3) of the correct option.`;
+
+Rules:
+- The response MUST be valid JSON
+- "answer" MUST be the index (0-3) of the correct option
+- Do NOT include explanations
+`;
 
     const response = await genAI.models.generateContent({
       model: "gemini-2.5-flash",
@@ -83,11 +104,52 @@ Make sure the response is valid JSON and the answer is the index (0-3) of the co
       })
     );
 
-    return NextResponse.json({ quizzes: savedQuizzes });
-  } catch (err: any) {
+    return NextResponse.json({
+      quizzes: [...existingQuizzes, ...savedQuizzes],
+    });
+  } catch (err: unknown) {
     console.error("QUIZ GEN ERROR:", err);
+
+    const message =
+      err instanceof Error
+        ? err.message.toLowerCase()
+        : String(err).toLowerCase();
+
+    // Gemini quota / rate limit
+    if (
+      message.includes("quota") ||
+      message.includes("rate") ||
+      message.includes("limit")
+    ) {
+      return NextResponse.json(
+        { error: "Gemini API quota exceeded" },
+        { status: 429 }
+      );
+    }
+
+    // Invalid or missing API key
+    if (
+      message.includes("api key") ||
+      message.includes("permission") ||
+      message.includes("unauthorized")
+    ) {
+      return NextResponse.json(
+        { error: "Invalid or missing Gemini API key" },
+        { status: 403 }
+      );
+    }
+
+    // Zod validation error
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Invalid input data" },
+        { status: 400 }
+      );
+    }
+
+    // Fallback
     return NextResponse.json(
-      { error: err.message ?? "Internal Server Error" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

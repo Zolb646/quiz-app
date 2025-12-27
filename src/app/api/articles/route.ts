@@ -23,6 +23,10 @@ export const POST = async (req: Request) => {
       where: { clerkId: session.userId! },
     });
 
+    if (!user) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     const res = await genAI.models.generateContent({
       model: "gemini-2.5-flash",
       contents: `Summarize the following text in 3 or 4 sentences:\n\n${data.content}`,
@@ -33,20 +37,72 @@ export const POST = async (req: Request) => {
         title: data.title,
         content: data.content,
         summary: res.text ?? "",
-        userId: user?.id!,
+        userId: user.id,
       },
     });
 
     return new Response(JSON.stringify({ article }), { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return new Response("Internal Server Error", { status: 500 });
+  } catch (error: unknown) {
+    console.error("API Error:", error);
+
+    // Narrow the type
+    const errMsg =
+      error instanceof Error
+        ? error.message.toLowerCase()
+        : JSON.stringify(error).toLowerCase();
+
+    // 🚫 Gemini quota / rate limit
+    if (
+      errMsg.includes("quota") ||
+      errMsg.includes("rate") ||
+      errMsg.includes("limit")
+    ) {
+      return NextResponse.json(
+        { error: "Gemini API quota exceeded" },
+        { status: 429 }
+      );
+    }
+
+    // 🔑 Invalid or missing API key
+    if (
+      errMsg.includes("api key") ||
+      errMsg.includes("permission") ||
+      errMsg.includes("unauthorized")
+    ) {
+      return NextResponse.json(
+        { error: "Invalid or missing Gemini API key" },
+        { status: 403 }
+      );
+    }
+
+    // ❌ Zod validation error
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Invalid input data" },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 };
 
 export const GET = async () => {
   try {
+    const session = await auth();
+
+    const user = await prisma.user.findUnique({
+      where: { clerkId: session.userId! },
+    });
+    if (!user) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     const articles = await prisma.article.findMany({
+      where: { userId: user.id },
       include: {
         quizzes: true,
       },
@@ -55,6 +111,7 @@ export const GET = async () => {
 
     const now = new Date();
 
+    const today: typeof articles = [];
     const yesterday: typeof articles = [];
     const last7Days: typeof articles = [];
     const last30Days: typeof articles = [];
@@ -65,6 +122,8 @@ export const GET = async () => {
         (1000 * 60 * 60 * 24);
 
       if (diffDays < 1) {
+        today.push(article);
+      } else if (diffDays < 2) {
         yesterday.push(article);
       } else if (diffDays <= 7) {
         last7Days.push(article);
@@ -74,7 +133,7 @@ export const GET = async () => {
     });
 
     return NextResponse.json(
-      { yesterday, last7Days, last30Days },
+      { today, yesterday, last7Days, last30Days },
       { status: 200 }
     );
   } catch (error) {

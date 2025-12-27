@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useStep } from "../_context/stepContext";
 import { usePathname } from "next/navigation";
 import { FiFileText } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 export const SummarySection = () => {
   const { article } = useArticle();
@@ -46,14 +47,26 @@ export const SummarySection = () => {
 
       const data = await res.json();
 
-      nextStep();
+      if (!res.ok) {
+        // Handle different API errors
+        if (res.status === 429) {
+          toast.error("Gemini API quota exceeded. Please try again later.");
+        } else {
+          toast.error(data?.error || "Failed to load quizzes.");
+        }
+        return;
+      }
 
+      // Success
       setQuizzes(data.quizzes ?? []);
       setCurrentIndex(0);
       setSelectedOption(null);
       setScore(0);
-    } catch (err) {
+      nextStep();
+    } catch (err: unknown) {
       console.error("Failed to load quizzes", err);
+      const message = err instanceof Error ? err.message : JSON.stringify(err);
+      toast.error(`Network error: ${message}`);
     } finally {
       setLoading(false);
     }

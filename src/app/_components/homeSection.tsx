@@ -15,14 +15,41 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useArticle } from "../_context/articleContext";
 import { useStep } from "../_context/stepContext";
+import { toast } from "react-toastify";
 
 export const HomeSection = () => {
   const [articleTitle, setArticleTitle] = React.useState("");
   const [articleContent, setArticleContent] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+
+  const [titleError, setTitleError] = React.useState("");
+  const [contentError, setContentError] = React.useState("");
+
   const { setArticle } = useArticle();
   const { nextStep } = useStep();
+
+  const validate = () => {
+    let valid = true;
+
+    if (articleTitle.trim().length < 3) {
+      setTitleError("Title must be at least 3 characters.");
+      valid = false;
+    } else {
+      setTitleError("");
+    }
+
+    if (articleContent.trim().length < 20) {
+      setContentError("Content must be at least 20 characters.");
+      valid = false;
+    } else {
+      setContentError("");
+    }
+
+    return valid;
+  };
+
   const handleGenerateSummary = async () => {
+    if (!validate()) return;
     if (!articleTitle || !articleContent) return;
 
     setLoading(true);
@@ -36,17 +63,27 @@ export const HomeSection = () => {
           content: articleContent,
         }),
       });
-
-      if (!response.ok) throw new Error("Failed to generate summary");
-
       const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          toast.error(
+            "Gemini API limit reached. Please wait or try again later."
+          );
+          return;
+        }
+
+        toast.error(data?.error || "Something went wrong.");
+        return;
+      }
+
       console.log("Generated Article:", data);
       setArticle(data.article);
 
       nextStep();
     } catch (error) {
       console.error(error);
-      alert("There was an error generating the summary.");
+      toast.error("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -72,12 +109,21 @@ export const HomeSection = () => {
             <span className="ml-1 text-[#71717a]">Article Title</span>
           </Label>
           <Input
-            type="text"
-            id="article-title"
-            className="shadow-none mt-2"
+            className={`mt-2 shadow-none ${
+              titleError ? "border-red-500 focus-visible:ring-red-500" : ""
+            }`}
             placeholder="Enter a title for your article..."
-            onChange={(e) => setArticleTitle(e.target.value)}
+            value={articleTitle}
+            onChange={(e) => {
+              setArticleTitle(e.target.value);
+              if (e.target.value.trim().length >= 3) {
+                setTitleError("");
+              }
+            }}
           />
+          {titleError && (
+            <p className="mt-1 text-sm text-red-500">{titleError}</p>
+          )}
         </div>
         <div>
           <Label
@@ -88,11 +134,21 @@ export const HomeSection = () => {
             <span className="ml-1 text-[#71717a]">Article Content</span>
           </Label>
           <Textarea
-            id="article-content"
+            className={`mt-2 resize-none shadow-none min-h-[120px] ${
+              contentError ? "border-red-500 focus-visible:ring-red-500" : ""
+            }`}
             placeholder="Paste your article content here..."
-            className="resize-none shadow-none min-h-30 mt-2  scrollbar-hide"
-            onChange={(e) => setArticleContent(e.target.value)}
+            value={articleContent}
+            onChange={(e) => {
+              setArticleContent(e.target.value);
+              if (e.target.value.trim().length >= 20) {
+                setContentError("");
+              }
+            }}
           />
+          {contentError && (
+            <p className="mt-1 text-sm text-red-500">{contentError}</p>
+          )}
         </div>
       </CardContent>
       <CardFooter className="justify-end">

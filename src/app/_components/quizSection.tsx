@@ -31,7 +31,6 @@ export const QuizSection = () => {
     setCurrentIndex,
     setSelectedOption,
     setScore,
-    selectedOption,
     currentIndex,
   } = useQuiz();
 

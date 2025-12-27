@@ -14,6 +14,7 @@ type Article = {
 };
 
 type HistoryResponse = {
+  today: Article[];
   yesterday: Article[];
   last7Days: Article[];
   last30Days: Article[];
@@ -22,11 +23,12 @@ type HistoryResponse = {
 export const SideBar = () => {
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<HistoryResponse>({
+    today: [],
     yesterday: [],
     last7Days: [],
     last30Days: [],
   });
-  const { setArticle } = useArticle();
+  const { setArticle, article } = useArticle();
   const router = useRouter();
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export const SideBar = () => {
       .then((res) => res.json())
       .then((data) => setHistory(data))
       .catch(console.error);
-  }, []);
+  }, [article]);
 
   const handleSelectArticle = (article: Article) => {
     setArticle(article);
@@ -69,6 +71,14 @@ export const SideBar = () => {
           {/* SECTIONS */}
           <div className="flex flex-col gap-5 overflow-y-auto">
             {/* YESTERDAY */}
+            {history?.today?.length > 0 && (
+              <Section
+                title="Yesterday"
+                articles={history?.today}
+                onSelect={handleSelectArticle}
+              />
+            )}
+
             {history?.yesterday?.length > 0 && (
               <Section
                 title="Yesterday"

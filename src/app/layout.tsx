@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ArticleProvider } from "./_context/articleContext";
 import { QuizProvider } from "./_context/quizContext";
 import InitUser from "./_components/initUser";
 import { StepProvider } from "./_context/stepContext";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,6 +44,13 @@ export default function RootLayout({
               >
                 <InitUser />
                 {children}
+                <ToastContainer
+                  position="top-center"
+                  autoClose={3000}
+                  hideProgressBar={false}
+                  closeOnClick
+                  pauseOnHover
+                />
               </body>
             </html>
           </StepProvider>

@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useArticle } from "../_context/articleContext";
 import { SummarySection } from "../_components/summarySection";
-import { Header } from "../_components/header";
-import { SideBar } from "../_components/sideBar";
 import { useStep } from "../_context/stepContext";
 import { AppShell } from "../_components/appShell";
 import { QuizSection } from "../_components/quizSection";

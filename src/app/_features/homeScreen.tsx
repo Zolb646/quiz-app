@@ -1,6 +1,4 @@
 "use client";
-import { Header } from "../_components/header";
-import { SideBar } from "../_components/sideBar";
 import React from "react";
 import { HomeSection } from "../_components/homeSection";
 import { SummarySection } from "../_components/summarySection";
