@@ -42,7 +42,7 @@ export default function RootLayout({
               <body
                 className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
               >
-                <InitUser />
+                {/* <InitUser /> */}
                 {children}
                 <ToastContainer
                   position="top-center"
