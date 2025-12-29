@@ -4,7 +4,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ArticleProvider } from "./_context/articleContext";
 import { QuizProvider } from "./_context/quizContext";
-import InitUser from "./_components/initUser";
+// import InitUser from "./_components/initUser";
 import { StepProvider } from "./_context/stepContext";
 import { ToastContainer } from "react-toastify";
 
