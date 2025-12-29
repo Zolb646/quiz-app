@@ -17,14 +17,12 @@ export const SummaryDialogContent = () => {
         {article?.title}
       </DialogTitle>
 
-      {/* Summary always visible */}
       {!isArticlePage && (
         <p className="text-sm text-zinc-700 whitespace-pre-line">
           {article?.summary}
         </p>
       )}
 
-      {/* Full content on article page */}
       {isArticlePage && (
         <p className="text-sm text-zinc-700 whitespace-pre-line">
           {article?.content}

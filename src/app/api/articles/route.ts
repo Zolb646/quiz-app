@@ -115,11 +115,12 @@ export const GET = async () => {
     const yesterday: typeof articles = [];
     const last7Days: typeof articles = [];
     const last30Days: typeof articles = [];
+    const byMonth: Record<string, typeof articles> = {};
 
     articles.forEach((article) => {
+      const createdAt = new Date(article.createdAt);
       const diffDays =
-        (now.getTime() - new Date(article.createdAt).getTime()) /
-        (1000 * 60 * 60 * 24);
+        (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
 
       if (diffDays < 1) {
         today.push(article);
@@ -129,11 +130,22 @@ export const GET = async () => {
         last7Days.push(article);
       } else if (diffDays <= 30) {
         last30Days.push(article);
+      } else {
+        // When diffdays are older than 30 it will show that month and year
+        const monthKey = createdAt.toLocaleString("en-US", {
+          month: "long",
+          year: "numeric",
+        });
+
+        if (!byMonth[monthKey]) {
+          byMonth[monthKey] = [];
+        }
+        byMonth[monthKey].push(article);
       }
     });
 
     return NextResponse.json(
-      { today, yesterday, last7Days, last30Days },
+      { today, yesterday, last7Days, last30Days, byMonth },
       { status: 200 }
     );
   } catch (error) {

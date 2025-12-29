@@ -1,5 +1,11 @@
 "use client";
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useMemo,
+} from "react";
 
 export type Quiz = {
   selectedOption: string;
@@ -24,6 +30,8 @@ type QuizContextType = {
   setSelectedOption: React.Dispatch<React.SetStateAction<string | null>>;
   score: number;
   setScore: React.Dispatch<React.SetStateAction<number>>;
+  isQuizActive: boolean;
+  resetQuiz: () => void;
 };
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -34,6 +42,16 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [score, setScore] = useState(0);
 
+  const isQuizActive = useMemo(() => {
+    return quizzes.length > 0 && currentIndex < quizzes.length;
+  }, [quizzes.length, currentIndex]);
+
+  const resetQuiz = () => {
+    setQuizzes([]);
+    setCurrentIndex(0);
+    setSelectedOption(null);
+    setScore(0);
+  };
   return (
     <QuizContext.Provider
       value={{
@@ -45,6 +63,8 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         setSelectedOption,
         score,
         setScore,
+        isQuizActive,
+        resetQuiz,
       }}
     >
       {children}
@@ -54,6 +74,8 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
 
 export const useQuiz = () => {
   const context = useContext(QuizContext);
-  if (!context) throw new Error("useQuiz must be used within a QuizProvider");
+  if (!context) {
+    throw new Error("useQuiz must be used within a QuizProvider");
+  }
   return context;
 };

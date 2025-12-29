@@ -23,6 +23,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useStep } from "../_context/stepContext";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export const QuizSection = () => {
   const {
@@ -35,6 +37,7 @@ export const QuizSection = () => {
   } = useQuiz();
 
   const { nextStep, setStep } = useStep();
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!quizzes.length) {
     return <p className="text-center">No quizzes available</p>;
@@ -43,6 +46,7 @@ export const QuizSection = () => {
   const currentQuiz = quizzes[currentIndex];
 
   const handleAnswerSelect = (option: string) => {
+    setIsLoading(true);
     const updatedQuizzes = [...quizzes];
 
     updatedQuizzes[currentIndex] = {
@@ -56,22 +60,25 @@ export const QuizSection = () => {
       setScore((prev) => prev + 1);
     }
 
-    if (currentIndex + 1 < updatedQuizzes.length) {
-      setCurrentIndex((prev) => prev + 1);
-      setSelectedOption(null);
-    } else {
-      nextStep();
-    }
+    setTimeout(() => {
+      if (currentIndex + 1 < updatedQuizzes.length) {
+        setCurrentIndex((prev) => prev + 1);
+        setSelectedOption(null);
+      } else {
+        nextStep();
+      }
+      setIsLoading(false);
+    }, 200);
   };
 
   return (
-    <Card className="bg-[#f0f2f5] shadow-none border-none relative w-full max-w-3xl mx-auto">
-      <CardHeader>
-        <div>
-          <CardTitle className="text-3xl font-bold text-center">
+    <Card className="bg-[#f0f2f5] shadow-none border-none relative w-full max-w-3xl mx-auto sm:mx-4">
+      <CardHeader className="relative">
+        <div className="text-center sm:text-left flex flex-col max-sm:gap-2">
+          <CardTitle className="text-2xl sm:text-3xl font-bold">
             <HeaderTitle title="Quick Test" />
           </CardTitle>
-          <CardDescription className="text-base">
+          <CardDescription className="text-sm sm:text-base">
             Take a quick test about your knowledge from your content
           </CardDescription>
         </div>
@@ -81,7 +88,7 @@ export const QuizSection = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-6 right-6 border bg-white"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 border bg-white"
             >
               <FiX />
             </Button>
@@ -112,18 +119,24 @@ export const QuizSection = () => {
         </AlertDialog>
       </CardHeader>
 
-      <CardContent className="bg-white border rounded-lg p-7 shadow-lg mx-6">
-        <div className="flex items-start justify-between w-full mb-4 gap-4">
-          <h1 className="text-xl font-medium flex-1 wrap-break-words">
+      <CardContent className="bg-white border rounded-lg p-5 sm:p-7 shadow-lg mx-2 sm:mx-6 relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+            <Loader2 className="animate-spin w-6 h-6 sm:w-8 sm:h-8" />
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full mb-4 gap-2 sm:gap-4">
+          <h1 className="text-lg sm:text-xl font-medium wrap-break-words flex-1">
             {currentQuiz.question}
           </h1>
-          <p className="text-xl shrink-0 whitespace-nowrap">
+          <p className="text-lg sm:text-xl shrink-0 whitespace-nowrap">
             {currentIndex + 1}
             <span className="text-base text-zinc-500"> / {quizzes.length}</span>
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 pt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-5">
           {currentQuiz.options.map((option) => (
             <Button
               key={option}
@@ -131,7 +144,9 @@ export const QuizSection = () => {
               variant="outline"
               className="h-full w-full transition-transform duration-200 hover:scale-105 hover:bg-black hover:text-white hover:shadow-lg active:translate-y-0 active:shadow-md"
             >
-              <p className="wrap-break-words whitespace-normal">{option}</p>
+              <p className="wrap-break-words whitespace-normal text-sm sm:text-base">
+                {option}
+              </p>
             </Button>
           ))}
         </div>

@@ -62,13 +62,15 @@ export const QuizResultSection = () => {
   };
 
   return (
-    <div className="min-w-md max-w-lg flex flex-col">
+    <div className="w-full max-w-md sm:max-w-lg mx-auto flex flex-col px-4 sm:px-6">
       <HeaderTitle title="Quiz Completed" />
-      <p className="text-gray-600 mt-2 font-medium">Let’s see what you did</p>
+      <p className="text-gray-600 mt-2 font-medium text-sm sm:text-base">
+        Let’s see what you did
+      </p>
 
       <Card className="mt-6">
-        <CardHeader className="flex flex-row items-baseline gap-2.5">
-          <CardTitle className="text-2xl">
+        <CardHeader className="flex flex-col sm:flex-row items-baseline sm:items-center gap-2.5">
+          <CardTitle className="text-xl sm:text-2xl">
             Your score: {score} / {quizzes.length}
           </CardTitle>
         </CardHeader>
@@ -78,24 +80,24 @@ export const QuizResultSection = () => {
             const isCorrect = res.userAnswer === res.correctAnswer;
 
             return (
-              <div key={idx} className="flex items-start gap-3">
+              <div key={idx} className="flex items-start sm:items-center gap-3">
                 {isCorrect ? (
-                  <HiOutlineCheckCircle className="text-green-500 size-7 shrink-0" />
+                  <HiOutlineCheckCircle className="text-green-500 w-7 h-7 shrink-0" />
                 ) : (
-                  <FiXCircle className="text-red-500 size-7 shrink-0" />
+                  <FiXCircle className="text-red-500 w-7 h-7 shrink-0" />
                 )}
 
                 <div className="flex flex-col gap-1 min-w-0">
-                  <p className="text-zinc-500 text-sm wrap-break-words">
+                  <p className="text-zinc-500 text-sm sm:text-base wrap-break-words">
                     {idx + 1}. {res.question}
                   </p>
 
-                  <p className="font-medium wrap-reak-words">
+                  <p className="font-medium wrap-break-words text-sm sm:text-base">
                     Your answer: {res.userAnswer || "No answer"}
                   </p>
 
                   {!isCorrect && (
-                    <p className="text-sm text-green-500 wrap-break-words">
+                    <p className="text-sm sm:text-base text-green-500 wrap-break-words">
                       Correct answer: {res.correctAnswer}
                     </p>
                   )}
@@ -105,14 +107,18 @@ export const QuizResultSection = () => {
           })}
         </CardContent>
 
-        <CardFooter className="gap-5 flex flex-col sm:flex-row">
-          <Button className="w-full" variant="outline" onClick={handleRetake}>
-            <RxReload className="size-4 mr-1" />
+        <CardFooter className="gap-3 flex flex-col sm:flex-row mt-4">
+          <Button
+            className="w-full sm:w-auto"
+            variant="outline"
+            onClick={handleRetake}
+          >
+            <RxReload className="w-4 h-4 mr-1" />
             Retake Quiz
           </Button>
 
-          <Button className="w-full" onClick={handleSaveAndLeave}>
-            <FaRegBookmark className="size-4 mr-1" />
+          <Button className="w-full sm:w-auto" onClick={handleSaveAndLeave}>
+            <FaRegBookmark className="w-4 h-4 mr-1" />
             Save and Leave
           </Button>
         </CardFooter>

@@ -89,61 +89,59 @@ export const HomeSection = () => {
     }
   };
   return (
-    <Card className="w-3xl">
+    <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle>
           <HeaderTitle title="" />
         </CardTitle>
-        <CardDescription className="text-base">
-          Paste your article below to generate a summarize and quiz question.
-          Your articles will saved in the sidebar for future reference.
+        <CardDescription className="text-xs sm:text-base text-gray-600">
+          Paste your article below to generate a summary and quiz questions.
+          Your articles will be saved in the sidebar for future reference.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div>
+
+      <CardContent className="flex flex-col gap-4">
+        <div className="flex flex-col">
           <Label
             htmlFor="article-title"
-            className="text-lg font-medium flex items-center"
+            className="text-sm sm:text-lg font-medium flex items-center gap-1"
           >
-            <FiFileText />
-            <span className="ml-1 text-[#71717a]">Article Title</span>
+            <FiFileText className="text-gray-500" />
+            <span>Article Title</span>
           </Label>
           <Input
-            className={`mt-2 shadow-none ${
+            className={`mt-2 shadow-none w-full lg:text-base text-xs ${
               titleError ? "border-red-500 focus-visible:ring-red-500" : ""
             }`}
             placeholder="Enter a title for your article..."
             value={articleTitle}
             onChange={(e) => {
               setArticleTitle(e.target.value);
-              if (e.target.value.trim().length >= 3) {
-                setTitleError("");
-              }
+              if (e.target.value.trim().length >= 3) setTitleError("");
             }}
           />
           {titleError && (
             <p className="mt-1 text-sm text-red-500">{titleError}</p>
           )}
         </div>
-        <div>
+
+        <div className="flex flex-col">
           <Label
             htmlFor="article-content"
-            className="text-lg font-medium flex items-center mt-5"
+            className="text-sm sm:text-lg font-medium flex items-center gap-1 mt-4"
           >
-            <FiFileText />
-            <span className="ml-1 text-[#71717a]">Article Content</span>
+            <FiFileText className="text-gray-500" />
+            <span>Article Content</span>
           </Label>
           <Textarea
-            className={`mt-2 resize-none shadow-none min-h-[120px] ${
+            className={`mt-2 resize-none shadow-none min-h-[120px] w-full lg:text-base text-xs ${
               contentError ? "border-red-500 focus-visible:ring-red-500" : ""
             }`}
             placeholder="Paste your article content here..."
             value={articleContent}
             onChange={(e) => {
               setArticleContent(e.target.value);
-              if (e.target.value.trim().length >= 20) {
-                setContentError("");
-              }
+              if (e.target.value.trim().length >= 20) setContentError("");
             }}
           />
           {contentError && (
@@ -151,21 +149,18 @@ export const HomeSection = () => {
           )}
         </div>
       </CardContent>
-      <CardFooter className="justify-end">
+
+      <CardFooter className="flex justify-end">
         <Button
           disabled={!articleContent.trim() || !articleTitle.trim() || loading}
-          onClick={() => {
-            console.log("error");
-
-            handleGenerateSummary();
-          }}
-          className={
+          onClick={handleGenerateSummary}
+          className={`w-full sm:w-auto sm:px-6 sm:py-2 ${
             !articleContent.trim() || !articleTitle.trim() || loading
-              ? "bg-[#71717A]"
+              ? "bg-gray-400"
               : ""
-          }
+          }`}
         >
-          {loading ? "Generating..." : "Generate summary"}
+          {loading ? "Generating..." : "Generate Summary"}
         </Button>
       </CardFooter>
     </Card>
