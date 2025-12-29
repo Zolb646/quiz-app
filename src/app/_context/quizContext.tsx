@@ -32,6 +32,7 @@ type QuizContextType = {
   setScore: React.Dispatch<React.SetStateAction<number>>;
   isQuizActive: boolean;
   resetQuiz: () => void;
+  setShowResults: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -40,16 +41,18 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
 
   const isQuizActive = useMemo(() => {
-    return quizzes.length > 0 && currentIndex < quizzes.length;
-  }, [quizzes.length, currentIndex]);
+    return quizzes.length > 0 && currentIndex < quizzes.length && !showResults;
+  }, [quizzes.length, currentIndex, showResults]);
 
   const resetQuiz = () => {
     setQuizzes([]);
     setCurrentIndex(0);
     setSelectedOption(null);
+    setShowResults(false);
     setScore(0);
   };
   return (
@@ -65,6 +68,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         setScore,
         isQuizActive,
         resetQuiz,
+        setShowResults,
       }}
     >
       {children}

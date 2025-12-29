@@ -34,6 +34,7 @@ export const QuizSection = () => {
     setSelectedOption,
     setScore,
     currentIndex,
+    setShowResults,
   } = useQuiz();
 
   const { nextStep, setStep } = useStep();
@@ -65,6 +66,7 @@ export const QuizSection = () => {
         setCurrentIndex((prev) => prev + 1);
         setSelectedOption(null);
       } else {
+        setShowResults(false);
         nextStep();
       }
       setIsLoading(false);
