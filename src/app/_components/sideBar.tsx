@@ -73,7 +73,7 @@ export const SideBar = () => {
             {/* YESTERDAY */}
             {history?.today?.length > 0 && (
               <Section
-                title="Yesterday"
+                title="Today"
                 articles={history?.today}
                 onSelect={handleSelectArticle}
               />
