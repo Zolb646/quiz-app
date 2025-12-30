@@ -24,6 +24,8 @@ export const QuizResultSection = () => {
     setSelectedOption,
     setScore,
     setQuizzes,
+    resetQuiz,
+    setShowResults,
   } = useQuiz();
   const { setStep, prevStep } = useStep();
 
@@ -33,7 +35,6 @@ export const QuizResultSection = () => {
     correctAnswer: q.answer,
   }));
 
-  // 🔁 Retake without regenerating
   const handleRetake = () => {
     const resetQuizzes = quizzes.map((q) => ({
       ...q,
@@ -44,21 +45,14 @@ export const QuizResultSection = () => {
     setCurrentIndex(0);
     setSelectedOption("");
     setScore(0);
+    setShowResults(false);
 
     prevStep();
   };
 
-  // 📌 Leave quiz safely
   const handleSaveAndLeave = () => {
-    setCurrentIndex(0);
-    setSelectedOption("");
-    setScore(0);
-
-    // OPTIONAL:
-    // If you want to completely clear quiz state, uncomment:
-    // setQuizzes([]);
-
-    setStep(0); // Back to article / summary
+    resetQuiz();
+    setStep(0);
   };
 
   return (

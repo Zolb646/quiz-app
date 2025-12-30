@@ -36,8 +36,8 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <ArticleProvider>
-        <QuizProvider>
-          <StepProvider>
+        <StepProvider>
+          <QuizProvider>
             <html lang="en">
               <body
                 className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
@@ -53,8 +53,8 @@ export default function RootLayout({
                 />
               </body>
             </html>
-          </StepProvider>
-        </QuizProvider>
+          </QuizProvider>
+        </StepProvider>
       </ArticleProvider>
     </ClerkProvider>
   );

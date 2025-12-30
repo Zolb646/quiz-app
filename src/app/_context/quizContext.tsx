@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   useMemo,
 } from "react";
+import { useStep } from "./stepContext";
 
 export type Quiz = {
   selectedOption: string;
@@ -33,6 +34,9 @@ type QuizContextType = {
   isQuizActive: boolean;
   resetQuiz: () => void;
   setShowResults: React.Dispatch<React.SetStateAction<boolean>>;
+  answerQuestion: (option: string) => void;
+  goToNext: () => void;
+  finishQuiz: () => void;
 };
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -43,10 +47,44 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
+  const { nextStep } = useStep();
 
   const isQuizActive = useMemo(() => {
     return quizzes.length > 0 && currentIndex < quizzes.length && !showResults;
   }, [quizzes.length, currentIndex, showResults]);
+
+  const answerQuestion = (option: string) => {
+    setQuizzes((prev) => {
+      const copy = [...prev];
+      copy[currentIndex] = {
+        ...copy[currentIndex],
+        selectedOption: option,
+      };
+      return copy;
+    });
+
+    setSelectedOption(option);
+
+    if (option === quizzes[currentIndex]?.answer) {
+      setScore((prev) => prev + 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (currentIndex + 1 < quizzes.length) {
+      setCurrentIndex((prev) => prev + 1);
+      setSelectedOption(null);
+    } else {
+      finishQuiz();
+    }
+  };
+
+  const finishQuiz = () => {
+    setShowResults(true);
+    setCurrentIndex(quizzes.length);
+    setSelectedOption(null);
+    nextStep();
+  };
 
   const resetQuiz = () => {
     setQuizzes([]);
@@ -69,6 +107,9 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         isQuizActive,
         resetQuiz,
         setShowResults,
+        goToNext,
+        answerQuestion,
+        finishQuiz,
       }}
     >
       {children}

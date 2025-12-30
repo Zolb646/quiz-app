@@ -29,15 +29,15 @@ import { Loader2 } from "lucide-react";
 export const QuizSection = () => {
   const {
     quizzes,
-    setQuizzes,
     setCurrentIndex,
     setSelectedOption,
     setScore,
     currentIndex,
-    setShowResults,
+    answerQuestion,
+    goToNext,
   } = useQuiz();
 
-  const { nextStep, setStep } = useStep();
+  const { setStep } = useStep();
   const [isLoading, setIsLoading] = useState(false);
 
   if (!quizzes.length) {
@@ -48,27 +48,11 @@ export const QuizSection = () => {
 
   const handleAnswerSelect = (option: string) => {
     setIsLoading(true);
-    const updatedQuizzes = [...quizzes];
 
-    updatedQuizzes[currentIndex] = {
-      ...updatedQuizzes[currentIndex],
-      selectedOption: option,
-    };
-
-    setQuizzes(updatedQuizzes);
-
-    if (option === currentQuiz.answer) {
-      setScore((prev) => prev + 1);
-    }
+    answerQuestion(option);
 
     setTimeout(() => {
-      if (currentIndex + 1 < updatedQuizzes.length) {
-        setCurrentIndex((prev) => prev + 1);
-        setSelectedOption(null);
-      } else {
-        setShowResults(false);
-        nextStep();
-      }
+      goToNext();
       setIsLoading(false);
     }, 200);
   };
@@ -130,7 +114,7 @@ export const QuizSection = () => {
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full mb-4 gap-2 sm:gap-4">
           <h1 className="text-lg sm:text-xl font-medium wrap-break-words flex-1">
-            {currentQuiz.question}
+            {currentQuiz?.question}
           </h1>
           <p className="text-lg sm:text-xl shrink-0 whitespace-nowrap">
             {currentIndex + 1}
@@ -139,7 +123,7 @@ export const QuizSection = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-5">
-          {currentQuiz.options.map((option) => (
+          {currentQuiz?.options.map((option) => (
             <Button
               key={option}
               onClick={() => handleAnswerSelect(option)}

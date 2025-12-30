@@ -92,7 +92,7 @@ export const SummarySection = () => {
         <CardContent className="flex-1 overflow-auto mt-3 h-fit">
           <Label className="flex gap-2 items-center text-sm sm:text-base">
             <BsBook className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="text-zinc-500">Summary Content</span>
+            <span className="text-zinc-500">Summarized content</span>
           </Label>
 
           <h1 className="mt-2 font-bold text-lg sm:text-xl lg:text-2xl">
@@ -111,7 +111,7 @@ export const SummarySection = () => {
                   className="font-medium flex items-center text-sm sm:text-base"
                 >
                   <FiFileText className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="ml-1 text-zinc-400">Article Title</span>
+                  <span className="ml-1 text-zinc-400">Article Content</span>
                 </Label>
               </div>
 
